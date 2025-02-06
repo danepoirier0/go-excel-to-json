@@ -65,14 +65,22 @@ func ReadExcel(excelFilepath string) (*ExcelJsonData, error) {
 			Headers:   headers,
 			Data:      data,
 		})
-		rtData.TotalRows += len(rows)
 	}
 
 	return rtData, nil
 }
 
-func ReadExcelToPagedJsonString(excelFilepath string, pageSize, pageIndex int) (int, string, error) {
-	return 0, "", errors.New("not implemented")
+func ReadExcelToPagedJsonString(excelFilepath string, sheetIndex, pageSize, pageIndex int) (string, error) {
+	excelData, err := ReadExcel(excelFilepath)
+	if err != nil {
+		return "", err
+	}
+	if sheetIndex >= len(excelData.Sheets) {
+		return "", errors.New("sheetIndex out of range")
+	}
+
+	// TODO
+	return "", errors.New("not implement")
 }
 
 // 获取文件名称和扩展名

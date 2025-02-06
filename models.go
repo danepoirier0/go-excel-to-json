@@ -8,7 +8,6 @@ type ExcelJsonSheet struct {
 }
 
 type ExcelJsonData struct {
-	FileName  string // 文件名
-	TotalRows int    // 所有sheets的总行数
-	Sheets    []ExcelJsonSheet
+	FileName string // 文件名
+	Sheets   []ExcelJsonSheet
 }
