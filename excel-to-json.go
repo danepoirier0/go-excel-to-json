@@ -1,12 +1,14 @@
 package goexceltojson
 
 import (
+	"encoding/json"
 	"errors"
 	"path/filepath"
 
 	"github.com/xuri/excelize/v2"
 )
 
+// 返回Excel的json结构体(包含文件名,sheet名,行数,表头,数据)
 func ReadExcel(excelFilepath string) (*ExcelJsonData, error) {
 	fileName, fileExt, err := getFileInfoFromPath(excelFilepath)
 	if err != nil {
@@ -70,17 +72,32 @@ func ReadExcel(excelFilepath string) (*ExcelJsonData, error) {
 	return rtData, nil
 }
 
-func ReadExcelToPagedJsonString(excelFilepath string, sheetIndex, pageSize, pageIndex int) (string, error) {
+// 返回Excel某个sheet的行数，分页的数据字符串
+func ReadExcelToPagedJsonString(excelFilepath string, sheetIndex, pageSize, pageIndex int) (int, string, error) {
 	excelData, err := ReadExcel(excelFilepath)
 	if err != nil {
-		return "", err
+		return 0, "", err
 	}
 	if sheetIndex >= len(excelData.Sheets) {
-		return "", errors.New("sheetIndex out of range")
+		return 0, "", errors.New("sheetIndex out of range")
 	}
 
-	// TODO
-	return "", errors.New("not implement")
+	start := (pageIndex - 1) * pageSize
+	end := start + pageSize
+	if start < 0 {
+		start = 0
+	}
+	if end > len(excelData.Sheets[sheetIndex].Data) {
+		end = len(excelData.Sheets[sheetIndex].Data)
+	}
+	datas := excelData.Sheets[sheetIndex].Data[start:end]
+
+	dataBytes, err := json.Marshal(datas)
+	if err != nil {
+		return 0, "", err
+	}
+
+	return len(excelData.Sheets[sheetIndex].Data), string(dataBytes), nil
 }
 
 // 获取文件名称和扩展名
